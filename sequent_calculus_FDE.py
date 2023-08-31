@@ -224,7 +224,7 @@ while formula[0] != "S":
         if formula[1] == "A":
             sequent = left_nalt(formula)
             sequents.append(beginning + sequent)
-            to_do.append(sequent)
+            to_do.append(beginning + sequent)
             to_do = to_do[1:]
             formula = to_do[0]
             beginning = ""
@@ -234,8 +234,8 @@ while formula[0] != "S":
             sequent_1, sequent_2 = left_nconj(formula)
             sequents.append(beginning + sequent_1)
             sequents.append(beginning + sequent_2)
-            to_do.append(sequent_1)
-            to_do.append(sequent_2)
+            to_do.append(beginning + sequent_1)
+            to_do.append(beginning + sequent_2)
             to_do = to_do[1:]
             formula = to_do[0]
             beginning = ""
@@ -248,7 +248,7 @@ while formula[0] != "S":
             '''Double negation'''
             sequent = double_negation_left(formula)
             sequents.append(beginning + sequent)
-            to_do.append(sequent)
+            to_do.append(beginning + sequent)
             to_do = to_do[1:]
             formula = to_do[0]
             print("Double negations", sequents)
