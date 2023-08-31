@@ -16,41 +16,41 @@ def correctness (formula):
 
 
 def splitting (formula):
-  '''Splits complex formula for subformulas.'''
-  counter = 1
-  subformula = ""
-  if formula[0] == "A" or formula[0] == "K":
-    subformula = subformula + formula[0]
-    formula = formula[1:]
-    while counter != 0:
-        if formula[0] == "A" or formula[0] == "K":
-            counter += 1
-            subformula = subformula + formula[0]
-            formula = formula[1:]
-        elif formula[0] in propositional_variables:
-            counter -= 1
-            subformula = subformula + formula[0]
-            formula = formula[1:]
-        else:
-            subformula = subformula + formula[0]
-            formula = formula[1:]
-  elif (formula[0] == "N" and (formula[1] == "A" or formula[1] == "K")):
-    subformula = subformula + formula[0]
-    formula = formula[2:]
-    while counter != 0:
-        if formula[0] == "A" or formula[0] == "K":
-            counter += 1
-            subformula = subformula + formula[0]
-            formula = formula[1:]
-        elif formula[0] in propositional_variables:
-            counter -= 1
-            subformula = subformula + formula[0]
-            formula = formula[1:]
-        else:
-            subformula = subformula + formula[0]
-            formula = formula[1:]
+    '''Splits complex formula for subformulas.'''
+    counter = 1
+    subformula = ""
+    if formula[0] == "A" or formula[0] == "K":
+        subformula = subformula + formula[0]
+        formula = formula[1:]
+        while counter != 0:
+            if formula[0] == "A" or formula[0] == "K":
+                counter += 1
+                subformula = subformula + formula[0]
+                formula = formula[1:]
+            elif formula[0] in propositional_variables:
+                counter -= 1
+                subformula = subformula + formula[0]
+                formula = formula[1:]
+            else:
+                subformula = subformula + formula[0]
+                formula = formula[1:]
+    elif (formula[0] == "N" and (formula[1] == "A" or formula[1] == "K")):
+        subformula = subformula + formula[0]
+        formula = formula[0] + formula[2:]
+        while counter != 0:
+            if formula[0] == "A" or formula[0] == "K":
+                counter += 1
+                subformula = subformula + formula[0]
+                formula = formula[1:]
+            elif formula[0] in propositional_variables:
+                counter -= 1
+                subformula = subformula + formula[0]
+                formula = "N" + formula[1:]
+            else:
+                subformula = subformula + formula[0]
+                formula = formula[1:]
 
-  return subformula[1:], formula
+    return subformula[1:], formula
 
 
 def left_separate(formula):
@@ -96,7 +96,7 @@ def left_nalt(formula):
     '''Function for left negation of alternative'''
     obj, rest = left_separate(formula)
     subformula_1, subformula_2 = splitting(obj)
-    sequent = "N" + subformula_1 + "," + "N" + subformula_2 + rest
+    sequent = subformula_1 + "," + subformula_2 + rest
     return sequent
 
 def left_conj(formula):
@@ -110,8 +110,8 @@ def left_nconj(formula):
     '''Function for left negation of conjunction.'''
     obj, rest = left_separate(formula)
     subformula_1, subformula_2 = splitting(obj)
-    sequent_1 = "N" + subformula_1 + rest
-    sequent_2 = "N" + subformula_2 + rest
+    sequent_1 = subformula_1 + rest
+    sequent_2 = subformula_2 + rest
     return sequent_1, sequent_2
 
 def right_nalt(formula):
@@ -119,8 +119,8 @@ def right_nalt(formula):
     obj, rest = right_separate(formula)
     '''Function for right negation of alternative.'''
     subformula_1, subformula_2 = splitting(obj)
-    sequent_1 = beginning + "N" + subformula_1 + rest
-    sequent_2 = beginning + "N" + subformula_2 + rest
+    sequent_1 = beginning + subformula_1 + rest
+    sequent_2 = beginning + subformula_2 + rest
     return sequent_1, sequent_2
 
 
@@ -149,7 +149,7 @@ def right_nconj(formula):
     beginning, formula = separate_sides(formula)
     obj, rest = right_separate(formula)
     subformula_1, subformula_2 = splitting(obj)
-    sequent = beginning + "N" + subformula_1 + "," + "N" + subformula_2 + "," + rest
+    sequent = beginning + subformula_1 + "," + subformula_2 + "," + rest
     return sequent
 
 def double_negation_left(formula):
@@ -196,63 +196,71 @@ sequents = []
 beginning = ""
 to_do = [formula]
 
-#This part of a code does not work properly.
+print("Entered formula: ", formula)
 
-# while formula[0] != "S":
-#     if formula[0] == "K":
-#         sequent = left_conj(formula)
-#         sequents.append(beginning + sequent)
-#         to_do.append(sequent)
-#         to_do = to_do[1:]
-#         formula = to_do[0]
-#         beginning = ""
-#         print("Left con", sequents, to_do, formula)
-#     elif formula[0] == "A":
-#         sequent_1, sequent_2 = left_alt(formula)
-#         sequents.append(beginning + sequent_1)
-#         sequents.append(beginning + sequent_2)
-#         to_do = to_do[1:]
-#         to_do.append(sequent_1)
-#         to_do.append(sequent_2)
-#         formula = to_do[0]
-#         beginning = ""
-#         print("Left alt", sequents)
-#     elif formula[0] == "N":
-#         if formula[1] == "A":
-#             sequent = left_nalt(formula)
-#             sequents.append(beginning + sequent)
-#             to_do = to_do[1:]
-#             to_do.append(sequent)
-#             formula = to_do[0]
-#             beginning = ""
-#             print("Left nalt", sequents)
-#         elif formula[1] == "K":
-#             sequent_1, sequent_2 = left_nconj(formula)
-#             sequents.append(beginning + sequent_1)
-#             sequents.append(beginning + sequent_2)
-#             to_do = to_do[1:]
-#             to_do.append(sequent_1)
-#             to_do.append(sequent_2)
-#             formula = to_do[0]
-#             beginning = ""
-#             print("Left ncon", sequents)
-#         elif formula[1] in propositional_variables:
-#             beginning = beginning + formula[:2]
-#             formula = formula[2:]
-#         elif formula[1] == "N":
-#             '''Double negation'''
-#             sequent = double_negation_left(formula)
-#             sequents.append(beginning + sequent)
-#             to_do = to_do[1:]
-#             to_do.append(sequent)
-#             formula = to_do[0]
-#             print("Double negation", sequents)
-#     elif ("A" in formula or "K" in formula or "NN" in formula for formula in to_do):
-#         if (formula[0] in propositional_variables) or formula[0] == ",":
-#             '''Formulas starting with propositional variable or ",".'''
-#             beginning = beginning + formula[0]
-#             formula = formula[1:]
-#
+
+while formula[0] != "S":
+    if formula[0] == "K":
+        sequent = left_conj(formula)
+        sequents.append(beginning + sequent)
+        to_do.append(beginning + sequent)
+        to_do = to_do[1:]
+        formula = to_do[0]
+        beginning = ""
+        print("Left con", sequents)
+        sequents = sequents[1:]
+    elif formula[0] == "A":
+        sequent_1, sequent_2 = left_alt(formula)
+        sequents.append(beginning + sequent_1)
+        sequents.append(beginning + sequent_2)
+        to_do.append(beginning + sequent_1)
+        to_do.append(beginning + sequent_2)
+        to_do = to_do[1:]
+        formula = to_do[0]
+        beginning = ""
+        print("Left alt", sequents)
+        sequents = sequents[1:]
+    elif formula[0] == "N":
+        if formula[1] == "A":
+            sequent = left_nalt(formula)
+            sequents.append(beginning + sequent)
+            to_do.append(sequent)
+            to_do = to_do[1:]
+            formula = to_do[0]
+            beginning = ""
+            print("Left nalt", sequents)
+            sequents = sequents[1:]
+        elif formula[1] == "K":
+            sequent_1, sequent_2 = left_nconj(formula)
+            sequents.append(beginning + sequent_1)
+            sequents.append(beginning + sequent_2)
+            to_do.append(sequent_1)
+            to_do.append(sequent_2)
+            to_do = to_do[1:]
+            formula = to_do[0]
+            beginning = ""
+            print("Left ncon", sequents)
+            sequents = sequents[1:]
+        elif formula[1] in propositional_variables:
+            beginning = beginning + formula[:2]
+            formula = formula[2:]
+        elif formula[1] == "N":
+            '''Double negation'''
+            sequent = double_negation_left(formula)
+            sequents.append(beginning + sequent)
+            to_do.append(sequent)
+            to_do = to_do[1:]
+            formula = to_do[0]
+            print("Double negations", sequents)
+            sequents = sequents[1:]
+    if (formula[0] in propositional_variables) or formula[0] == ",":
+        '''Formulas starting with propositional variable or ",".'''
+        if any("A" in formula or "K" in formula or "NN" in formula for formula in to_do):
+            beginning = beginning + formula[0]
+            formula = formula[1:]
+        else:
+            formula = formula[1:]
+
 # to_do = sequents
 # beginning = ""
 #
@@ -320,10 +328,11 @@ to_do = [formula]
 
 def separate_left(sequent):
     left = ""
-    while sequent[0] != "S":
-        left = left + sequent[0]
-        sequent = sequent[1:]
-    return left, sequent
+    current_sequent = sequent
+    while current_sequent[0] != "S":
+        left += current_sequent[0]
+        current_sequent = current_sequent[1:]
+    return left, current_sequent
 
 def duplicates(list_1, list_2):
     return any(elem in list_2 for elem in list_1)
